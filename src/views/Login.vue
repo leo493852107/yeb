@@ -9,7 +9,7 @@
         <el-input type="password" autocomplete="off" v-model="loginForm.password" placeholder="请输入密码"></el-input>
       </el-form-item>
 
-      <el-form-item prop="code">
+      <el-form-item prop="code" @click="updateCaptcha">
         <el-input type="text" autocomplete="off" v-model="loginForm.code" placeholder="点击图片更换验证码"
                   style="width: 250px; margin-right: 5px"></el-input>
         <img :src="captchaUrl">
@@ -25,7 +25,7 @@ export default {
   name: "Login",
   data() {
     return {
-      captchaUrl: '',
+      captchaUrl: '/captcha?time=' + new Date(),
       loginForm: {
         username: 'admin',
         password: '',
@@ -40,6 +40,9 @@ export default {
     }
   },
   methods: {
+    updateCaptcha() {
+      this.captchaUrl = '/captcha?time=' + new Date();
+    },
     submitLogin() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
@@ -75,5 +78,10 @@ export default {
 .loginRemember {
   text-align: left;
   margin: 0px 0px 15px 0px;
+}
+
+.el-form-item__content{
+  display: flex;
+  align-items: center;
 }
 </style>
