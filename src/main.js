@@ -5,8 +5,16 @@ import store from './store'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+import {postRequest, putRequest, getRequest, deleteRequest} from "@/utils/api";
+
 Vue.config.productionTip = false
 Vue.use(ElementUI);
+
+// 插件形式使用请求
+Vue.prototype.postRequest = postRequest;
+Vue.prototype.putRequest = putRequest;
+Vue.prototype.getRequest = getRequest;
+Vue.prototype.deleteRequest = deleteRequest;
 
 new Vue({
   router,

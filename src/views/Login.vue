@@ -1,6 +1,13 @@
 <template>
   <div>
-    <el-form ref="loginForm" :rules="rules" :model="loginForm" class="loginContainer">
+    <el-form ref="loginForm"
+             v-loading="loading"
+             element-loading-text="登录中..."
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)"
+             :rules="rules"
+             :model="loginForm"
+             class="loginContainer">
       <h3 class="loginTitle">系统登录</h3>
       <el-form-item label="用户名" prop="username">
         <el-input type="text" autocomplete="off" v-model="loginForm.username" placeholder="请输入用户名"></el-input>
@@ -28,9 +35,10 @@ export default {
       captchaUrl: '/captcha?time=' + new Date(),
       loginForm: {
         username: 'admin',
-        password: '',
+        password: '123',
         code: ''
       },
+      loading: false,
       checked: true,
       rules: {
         username: [{required: true, message: '请输入用户名', trigger: 'blur'}],
@@ -45,8 +53,18 @@ export default {
     },
     submitLogin() {
       this.$refs.loginForm.validate((valid) => {
+        this.loading = true;
         if (valid) {
-          alert('submit!');
+          this.postRequest('/login', this.loginForm).then(resp => {
+            if (resp) {
+              // 存储 token
+              const tokenStr = resp.obj.tokenHead + resp.obj.token;
+              window.sessionStorage.setItem('tokenStr', tokenStr);
+              this.loading = false;
+              // 跳转首页
+              this.$router.replace('/home');
+            }
+          })
         } else {
           console.log('error submit!!');
           this.$message.error('请输入所有字段');
@@ -80,7 +98,7 @@ export default {
   margin: 0px 0px 15px 0px;
 }
 
-.el-form-item__content{
+.el-form-item__content {
   display: flex;
   align-items: center;
 }
