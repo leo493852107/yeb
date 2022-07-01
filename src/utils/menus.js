@@ -37,15 +37,17 @@ export const formatRoutes = (routes) => {
             iconCls: iconCls,
             children: children,
             component(resolve) {
-                if (component.startsWith('Emp')){
+                if (component.startsWith('Home')) {
+                    require(['../views/' + component + '.vue'], resolve);
+                } else if (component.startsWith('Emp')) {
                     require(['../views/emp/' + component + '.vue'], resolve);
-                } else if (component.startsWith('Per')){
+                } else if (component.startsWith('Per')) {
                     require(['../views/per/' + component + '.vue'], resolve);
-                } else if (component.startsWith('Sal')){
+                } else if (component.startsWith('Sal')) {
                     require(['../views/sal/' + component + '.vue'], resolve);
-                } else if (component.startsWith('Sta')){
+                } else if (component.startsWith('Sta')) {
                     require(['../views/sta/' + component + '.vue'], resolve);
-                } else if (component.startsWith('Sys')){
+                } else if (component.startsWith('Sys')) {
                     require(['../views/sys/' + component + '.vue'], resolve);
                 }
             }
