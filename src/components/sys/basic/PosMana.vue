@@ -6,9 +6,12 @@
           class="addPosInput"
           v-model="pos.name"
           suffix-icon="el-icon-plus"
+          @keydown.enter.native="addPosition"
           placeholder="请输入职位">
       </el-input>
-      <el-button icon="el-icon-plus" type="primary" size="small">添加</el-button>
+      <el-button icon="el-icon-plus" type="primary" size="small"
+                 @click="addPosition">添加
+      </el-button>
     </div>
     <div>
       <el-table class="posManaMain"
@@ -17,6 +20,10 @@
                 border
                 size="small"
                 style="width: 80%">
+        <el-table-column
+            type="selection"
+            width="55">
+        </el-table-column>
         <el-table-column
             prop="id"
             label="编号"
@@ -32,10 +39,18 @@
             label="创建时间"
             width="200">
         </el-table-column>
-        <el-table-column
-            prop="enable"
-            label="是否启用"
-            width="120">
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+                size="mini"
+                @click="handleEdit(scope.$index, scope.row)">编辑
+            </el-button>
+            <el-button
+                size="mini"
+                type="danger"
+                @click="handleDelete(scope.$index, scope.row)">删除
+            </el-button>
+          </template>
         </el-table-column>
       </el-table>
     </div>
@@ -52,6 +67,51 @@ export default {
       },
       positions: []
     }
+  },
+  methods: {
+    initPositions() {
+      this.getRequest('/system/basic/pos/').then(response => {
+        if (response) {
+          this.positions = response;
+        }
+      })
+    },
+    addPosition() {
+      if (this.pos.name) {
+        this.postRequest('/system/basic/pos/', this.pos).then(response => {
+          if (response) {
+            this.initPositions();
+            this.pos.name = '';
+          }
+        })
+      } else {
+        this.$message.error("职位名称不能为空");
+      }
+    },
+    handleEdit(index, data) {
+
+    },
+    handleDelete(index, data) {
+      this.$confirm('此操作将永久删除[' + data.name + '], 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRequest('/system/basic/pos/' + data.id).then(response => {
+          if (response) {
+            this.initPositions();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    }
+  },
+  mounted() {
+    this.initPositions();
   }
 }
 </script>
