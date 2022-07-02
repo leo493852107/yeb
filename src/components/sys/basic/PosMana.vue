@@ -1,12 +1,10 @@
 <template>
-<div>
-  2
-</div>
+
 </template>
 
 <script>
 export default {
-  name: "Test1"
+  name: "PosMana"
 }
 </script>
 
