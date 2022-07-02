@@ -53,16 +53,17 @@ export default {
     },
     submitLogin() {
       this.$refs.loginForm.validate((valid) => {
-        this.loading = true;
         if (valid) {
+          this.loading = true;
           this.postRequest('/login', this.loginForm).then(resp => {
+            this.loading = false;
             if (resp) {
               // 存储 token
               const tokenStr = resp.obj.tokenHead + resp.obj.token;
               window.sessionStorage.setItem('tokenStr', tokenStr);
-              this.loading = false;
-              // 跳转首页
-              this.$router.replace('/home');
+              // 页面跳转
+              let path = this.$route.query.redirect;
+              this.$router.replace((path === '/' || path === undefined) ? '/home' : path);
             }
           })
         } else {

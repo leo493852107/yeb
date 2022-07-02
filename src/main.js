@@ -18,6 +18,7 @@ Vue.prototype.putRequest = putRequest;
 Vue.prototype.getRequest = getRequest;
 Vue.prototype.deleteRequest = deleteRequest;
 
+// 注册一个全局前置守卫
 router.beforeEach((to, from, next) => {
     if (window.sessionStorage.getItem('tokenStr')) {
         initMenu(router, store);
@@ -33,7 +34,11 @@ router.beforeEach((to, from, next) => {
         }
         next();
     } else {
-        next();
+        if (to.path === '/') {
+            next();
+        } else {
+            next('/?redirect=' + to.path);
+        }
     }
 })
 
