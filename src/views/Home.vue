@@ -3,14 +3,14 @@
     <el-container>
       <el-header class="homeHeader">
         <div class="title">云E办</div>
-        <el-dropdown class="userInfo">
+        <el-dropdown class="userInfo" @command="handleCommand">
           <span class="el-dropdown-link">
             {{ user.name }}<i><img :src="user.userFace"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人中心</el-dropdown-item>
-            <el-dropdown-item>设置</el-dropdown-item>
-            <el-dropdown-item>注销</el-dropdown-item>
+            <el-dropdown-item command="userInfo">个人中心</el-dropdown-item>
+            <el-dropdown-item command="setting">设置</el-dropdown-item>
+            <el-dropdown-item command="logout">注销</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
@@ -43,7 +43,29 @@ export default {
       user: JSON.parse(window.sessionStorage.getItem('user'))
     }
   },
-  methods: {},
+  methods: {
+    handleCommand(command) {
+      if (command == 'logout') {
+        this.$confirm('此操作将注销, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 注销登录
+          this.postRequest('/logout');
+          window.sessionStorage.removeItem('tokenStr');
+          window.sessionStorage.removeItem('user');
+          this.$store.commit('initRoutes', []);
+          this.$router.replace('/');
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          });
+        });
+      }
+    }
+  },
   computed: {
     routes() {
       return this.$store.state.routes;
