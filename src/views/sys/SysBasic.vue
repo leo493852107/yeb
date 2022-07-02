@@ -1,11 +1,11 @@
 <template>
   <div>
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
-      <el-tab-pane label="部门管理" name="DeptMana">部门管理</el-tab-pane>
-      <el-tab-pane label="职位管理" name="PosMana">职位管理</el-tab-pane>
-      <el-tab-pane label="职称管理" name="JobLevelMana">职称管理</el-tab-pane>
-      <el-tab-pane label="职称管理" name="EcMana">职称管理</el-tab-pane>
-      <el-tab-pane label="权限组" name="PermissMana">权限组</el-tab-pane>
+      <el-tab-pane label="部门管理" name="DeptMana"><dept-mana></dept-mana></el-tab-pane>
+      <el-tab-pane label="职位管理" name="PosMana"><pos-mana></pos-mana></el-tab-pane>
+      <el-tab-pane label="职称管理" name="JobLevelMana"><job-level-mana></job-level-mana></el-tab-pane>
+      <el-tab-pane label="职称管理" name="EcMana"><ec-mana></ec-mana></el-tab-pane>
+      <el-tab-pane label="权限组" name="PermissMana"><permiss-mana></permiss-mana></el-tab-pane>
     </el-tabs>
   </div>
 </template>
