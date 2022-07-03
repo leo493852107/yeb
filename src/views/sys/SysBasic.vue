@@ -21,7 +21,7 @@ export default {
   name: "SysBasic",
   data() {
     return {
-      activeName: 'DeptMana'
+      activeName: 'JobLevelMana'
     }
   },
   components: {
