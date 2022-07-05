@@ -4,8 +4,8 @@
       <el-input size="small" placeholder="请输入英文名称" v-model="role.name">
         <template slot="prepend">ROLE_</template>
       </el-input>
-      <el-input size="small" v-model="role.nameZh" placeholder="请输入中文名称"></el-input>
-      <el-button size="small" type="primary" icon="el-icon-plus">添加角色</el-button>
+      <el-input size="small" v-model="role.nameZh" placeholder="请输入中文名称" @keydown.enter.native="addRole"></el-input>
+      <el-button size="small" type="primary" icon="el-icon-plus" @click="addRole">添加角色</el-button>
     </div>
     <div class="permissManaMain">
       <el-collapse v-model="activeName" accordion @change="changeCollapse">
@@ -13,13 +13,14 @@
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>可访问资源</span>
-              <el-button style="float: right; padding: 3px 0; color: red" type="text" icon="el-icon-delete"></el-button>
+              <el-button style="float: right; padding: 3px 0; color: red" type="text" icon="el-icon-delete" @click="deleteRole(r)">删除</el-button>
             </div>
             <div>
               <el-tree show-checkbox
                        :data="allMenus"
                        :props="defaultProps"
                        ref="tree"
+                       :key="index"
                        node-key="id"
                        :default-checked-keys="selectedMenus"
               ></el-tree>
@@ -58,8 +59,39 @@ export default {
     this.getAllRolesData();
   },
   methods: {
+    deleteRole(role){
+      this.$confirm('此操作将永久删除[' + role.name + '], 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRequest('/system/basic/permission/role/' + role.id).then(response => {
+          if (response) {
+            this.getAllRolesData();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    addRole() {
+      if (this.role.name && this.role.nameZh) {
+        this.postRequest('/system/basic/permission/role', this.role).then(response => {
+          if (response) {
+            this.getAllRolesData();
+            this.role.name = '';
+            this.role.nameZh = '';
+          }
+        })
+      } else {
+        this.$message.error('字段不能为空');
+      }
+    },
     cancelUpdate() {
-      this.cancelUpdate = -1;
+      this.activeName = -1;
     },
     doUpdate(rid, index) {
       let tree = this.$refs.tree[index];
@@ -70,7 +102,7 @@ export default {
       });
       this.putRequest(url).then(response => {
         if (response) {
-          this.getAllRolesData();
+          this.activeName = -1;
         }
       })
 
