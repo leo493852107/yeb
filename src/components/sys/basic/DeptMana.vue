@@ -97,18 +97,19 @@ export default {
       this.depObj.parentId = data.id;
       this.dialogVisible = true;
     },
-    initDet() {
+    initDep() {
       this.depObj = {
         name: '',
         parentId: -1
       };
       this.parentDepName = '';
     },
+    // 递归查询所有部门信息，deps 查询到的整个数组，dep 添加的部门
     addDep2Deps(deps, depObj) {
       for (let i = 0; i < deps.length; i++) {
         let d = deps[i];
         if (d.id === depObj.parentId) {
-          d.children = d.children.concat(depObj);
+          d.children = d.children.concat(depObj); // 把 depObj 加为 d 的子部门
           if (d.children.length > 0) {
             d.isParent = true;
           }
@@ -121,12 +122,10 @@ export default {
     doAddDep() {
       this.postRequest('/system/basic/department/', this.depObj).then(response => {
         if (response) {
-          console.log(this.deps);
-          console.log(response.obj);
-          this.addDep2Deps(this.deps, this.depObj);
-          // this.addDep2Deps(this.deps, response.obj);
-          this.initDet();
           this.dialogVisible = false;
+          // 要修复后端就可以用，现在 response.obj 是空
+          this.addDep2Deps(this.deps, response.obj);
+          this.initDep();
         }
       })
     },
