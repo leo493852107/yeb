@@ -3,8 +3,11 @@
     <div style="display: flex; justify-content: space-between">
       <div>
         <el-input style="width: 300px;margin-right: 10px" prefix-icon="el-icon-search"
-                  placeholder="请输入员工名进行搜索.."></el-input>
-        <el-button type="primary" prefix-icon="el-icon-search">搜索</el-button>
+                  v-model="empName"
+                  @keydown.enter.native="getEmps"
+                  @clear="getEmps"
+                  placeholder="请输入员工名进行搜索.." clearable></el-input>
+        <el-button type="primary" prefix-icon="el-icon-search" @click="getEmps">搜索</el-button>
         <el-button type="primary">
           <i class="fa fa-angle-double-down" aria-hidden="true"></i>
           高级搜索
@@ -201,6 +204,15 @@
           </template>
         </el-table-column>
       </el-table>
+      <div style="display: flex; justify-content: flex-end; margin-top: 10px">
+        <el-pagination
+            background
+            layout="sizes, prev, pager, next, jumper, ->, total"
+            @current-change="currentChange"
+            @size-change="sizeChange"
+            :total="total">
+        </el-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -211,19 +223,32 @@ export default {
   data() {
     return {
       emps: [],
-      loading: false
+      loading: false,
+      total: 0,
+      currentPage: 1,
+      size: 10,
+      empName: ''
     }
   },
   mounted() {
     this.getEmps();
   },
   methods: {
+    sizeChange(size) {
+      this.size = size;
+      this.getEmps();
+    },
+    currentChange(currentPage) {
+      this.currentPage = currentPage;
+      this.getEmps();
+    },
     getEmps() {
       this.loading = true;
-      this.getRequest('/employee/basic/').then(resp => {
+      this.getRequest('/employee/basic/?currentPage=' + this.currentPage + '&size=' + this.size + '&name=' + this.empName).then(resp => {
         this.loading = false;
         if (resp) {
           this.emps = resp.data;
+          this.total = resp.total;
         }
       })
     }
