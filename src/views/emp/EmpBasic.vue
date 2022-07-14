@@ -319,8 +319,20 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="所属部门:" prop="departmentId">
-                <el-input v-model="emp.departmentId" placeholder="请输入所属部门" prefix-icon="el-icon-edit" size="mini"
-                          style="width: 150px"></el-input>
+                <el-popover
+                    placement="bottom"
+                    title="请选择部门"
+                    width="200"
+                    trigger="manual"
+                    v-model="visible">
+                  <el-tree :data="allDeps"
+                           default-expand-all="true"
+                           :props="defaultProps"
+                           @node-click="handleNodeClick"></el-tree>
+                  <div slot="reference" style="width: 150px; display: inline-flex; border: 1px solid #dedede; height: 24px;
+                border-radius: 5px; cursor: pointer; align-items: center; font-size: 13px; padding-left: 8px;" @click="showDepView">{{ inputDepName }}
+                  </div>
+                </el-popover>
               </el-form-item>
             </el-col>
             <el-col :span="7">
@@ -452,6 +464,13 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      },
+      allDeps: [],
+      inputDepName: '',
+      visible: false,
       emps: [],
       loading: false,
       total: 0,
@@ -501,6 +520,14 @@ export default {
     this.initData();
   },
   methods: {
+    handleNodeClick(data) {
+      this.inputDepName = data.name;
+      this.emp.departmentId = data.id;
+      this.visible = !this.visible;
+    },
+    showDepView() {
+      this.visible = !this.visible;
+    },
     getMaxWorkId() {
       this.getRequest('/employee/basic/maxWorkID').then(resp => {
         if (resp) {
@@ -545,6 +572,16 @@ export default {
         })
       } else {
         this.politicsStatus = JSON.parse(window.sessionStorage.getItem('politicsStatus'));
+      }
+      if (!window.sessionStorage.getItem('allDeps')) {
+        this.getRequest('/employee/basic/deps').then(resp => {
+          if (resp) {
+            this.allDeps = resp;
+            window.sessionStorage.setItem('allDeps', JSON.stringify(resp));
+          }
+        })
+      } else {
+        this.allDeps = JSON.parse(window.sessionStorage.getItem('allDeps'));
       }
     },
     showAddEmpView() {
