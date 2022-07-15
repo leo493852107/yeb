@@ -198,9 +198,9 @@
             fixed="right"
             width="200">
           <template slot-scope="scope">
-            <el-button style="padding: 3px" size="mini">编辑</el-button>
+            <el-button style="padding: 3px" size="mini" @click="showEditEmpView(scope.row)">编辑</el-button>
             <el-button style="padding: 3px" size="mini" type="primary">查看高级资料</el-button>
-            <el-button style="padding: 3px" size="mini" type="danger">删除</el-button>
+            <el-button style="padding: 3px" size="mini" type="danger" @click="deleteEmp(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -215,7 +215,7 @@
       </div>
     </div>
     <el-dialog
-        title="添加员工"
+        :title="title"
         :visible.sync="dialogVisible"
         width="80%">
       <div>
@@ -456,7 +456,7 @@
       </div>
       <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="doAddEmp">确 定</el-button>
+    <el-button type="primary" @click="doAddEditEmp">确 定</el-button>
   </span>
     </el-dialog>
   </div>
@@ -467,6 +467,7 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      title: '',
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -482,6 +483,7 @@ export default {
       empName: '',
       dialogVisible: false,
       emp: {
+        'id': null,
         'name': '',
         'gender': '',
         'birthday': '',
@@ -560,17 +562,55 @@ export default {
     this.initData();
   },
   methods: {
-    doAddEmp() {
-      this.$refs['empForm'].validate(valid => {
-        if (valid) {
-          this.postRequest('/employee/basic/', this.emp).then(resp => {
-            if (resp) {
-              this.dialogVisible = false;
-              this.getEmps();
-            }
-          })
-        }
-      })
+    showEditEmpView(data) {
+      this.title = '编辑员工信息';
+      this.emp = data;
+      this.inputDepName = data.department.name;
+      this.getPositions();
+      this.dialogVisible = true;
+    },
+    deleteEmp(data) {
+      this.$confirm('此操作将永久删除' + data.name + ', 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRequest('/employee/basic/' + data.id).then(response => {
+          if (response) {
+            this.getEmps();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    doAddEditEmp() {
+      if (this.emp.id) {
+        this.$refs['empForm'].validate(valid => {
+          if (valid) {
+            this.putRequest('/employee/basic/', this.emp).then(resp => {
+              if (resp) {
+                this.dialogVisible = false;
+                this.getEmps();
+              }
+            })
+          }
+        })
+      } else {
+        this.$refs['empForm'].validate(valid => {
+          if (valid) {
+            this.postRequest('/employee/basic/', this.emp).then(resp => {
+              if (resp) {
+                this.dialogVisible = false;
+                this.getEmps();
+              }
+            })
+          }
+        })
+      }
     },
     handleNodeClick(data) {
       this.inputDepName = data.name;
@@ -637,6 +677,9 @@ export default {
       }
     },
     showAddEmpView() {
+      this.title = '添加员工';
+      this.emp = this.$options.data().emp;
+      this.inputDepName = '';
       this.getMaxWorkId();
       this.getPositions();
       this.dialogVisible = true;
