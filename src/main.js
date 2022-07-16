@@ -8,6 +8,7 @@ import 'font-awesome/css/font-awesome.css';
 
 import {postRequest, putRequest, getRequest, deleteRequest} from "@/utils/api";
 import {initMenu} from "@/utils/menus";
+import {downloadRequest} from "@/utils/download";
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, {size: 'small'});
@@ -17,6 +18,7 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.getRequest = getRequest;
 Vue.prototype.deleteRequest = deleteRequest;
+Vue.prototype.downloadRequest = downloadRequest;
 
 // 注册一个全局前置守卫
 router.beforeEach((to, from, next) => {

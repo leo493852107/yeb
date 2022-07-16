@@ -14,12 +14,20 @@
         </el-button>
       </div>
       <div>
-        <el-button type="success">
-          <i class="fa fa-level-up" aria-hidden="true"></i>
-          导入数据
-        </el-button>
-        <el-button type="success">
-          <i class="fa fa-level-down" aria-hidden="true"></i>
+        <el-upload
+            style="display: inline-flex; margin-right: 8px;"
+            :headers="headers"
+            :show-file-list="false"
+            :before-upload="beforeUpload"
+            :on-success="onSuccess"
+            :on-error="onError"
+            :disabled="importDataDisabled"
+            action="/employee/basic/import">
+          <el-button type="success" :icon="importDataBtnIcon" :disabled="importDataDisabled">
+            {{ importDataBtnText }}
+          </el-button>
+        </el-upload>
+        <el-button @click="exportData" type="success" icon="el-icon-download">
           导出数据
         </el-button>
         <el-button type="primary" icon="el-icon-plus" @click="showAddEmpView">添加员工</el-button>
@@ -467,6 +475,12 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      headers: {
+        Authorization: window.sessionStorage.getItem('tokenStr')
+      },
+      importDataDisabled: false,
+      importDataBtnText: '导入数据',
+      importDataBtnIcon: 'el-icon-upload2',
       title: '',
       defaultProps: {
         children: 'children',
@@ -562,6 +576,25 @@ export default {
     this.initData();
   },
   methods: {
+    onSuccess() {
+      this.importDataBtnIcon = 'el-icon-upload2';
+      this.importDataBtnText = '导入数据';
+      this.importDataDisabled = false;
+      this.getEmps();
+    },
+    onError() {
+      this.importDataBtnIcon = 'el-icon-upload2';
+      this.importDataBtnText = '导入数据';
+      this.importDataDisabled = false;
+    },
+    beforeUpload() {
+      this.importDataBtnIcon = 'el-icon-loading';
+      this.importDataBtnText = '正在上传';
+      this.importDataDisabled = true;
+    },
+    exportData() {
+      this.downloadRequest('/employee/basic/export');
+    },
     showEditEmpView(data) {
       this.title = '编辑员工信息';
       this.emp = data;
